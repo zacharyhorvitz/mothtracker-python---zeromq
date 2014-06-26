@@ -1,8 +1,18 @@
 import cv2
 import numpy as np
+import zmq
+import time
+import sys
 from matplotlib import pylab as pyl
 
 print cv2.__version__
+
+
+address = 'tcp://localhost:2079'
+context1 = zmq.Context()
+socket1 = context1.socket(zmq.PUB)
+socket1.connect(address)
+
 
 
 cv2.namedWindow("window")
@@ -13,7 +23,7 @@ if mothstream.isOpened():
     cam, mothframe = mothstream.read();
 else:
     cam = False
-
+    
 
 def searchforgreatest(array):
     maxarea = 0
@@ -26,8 +36,6 @@ def searchforgreatest(array):
             maxarea = currentarea
     return max
             
-            
-        
 
 while True:
     
@@ -42,7 +50,9 @@ while True:
         fixedcenter = (int(circlecenter[0]), int(circlecenter[1]))
         fixedradius = int(radius)
         cv2.circle(mothframe, fixedcenter , fixedradius,255,0)
-
+        socket1.send("%d %d" % (fixedcenter[0],fixedcenter[1]))
+        
+    
     cv2.imshow("window", mothframe)
         
   
